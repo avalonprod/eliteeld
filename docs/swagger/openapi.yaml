@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: Eliteeld API Documentation
+  description: |-
+     This API Eliteeld specification document
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: avalonsendler@gmail.com
+  version: 0.1.0
+externalDocs:
+  description: Find out more about Eliteeld
+  url: http://swagger.io
+servers:
+  - url: https://gasstrem.com
+tags:
+  - name: auth
+    description: Authorization and user registration
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+
+paths:
+  /accounts/company/register:
+    post:
+      tags:
+        - auth
+      summary: Register new company
+      description: Register new company
+      operationId: registerCompany
+      requestBody:
+        description: Update an existent pet in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyRegistrationRequest'
+        required: true
+      responses:
+        '200':
+          description: Creted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyRegistrationRequest'          
+        '400':
+          description: Invalid registration date
+        '404':
+          description: this path not a found
+        '405':
+          description: Validation exception
+
+            
+
+components:
+  schemas:
+    CompanyRegistrationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          format: string
+          example: "John"
+        surname: 
+          type: string
+          format: string
+          example: "Smith"
+        phone:
+          type: string
+          format: string
+          example: "+1203810382"
+        usdot:
+          type: integer
+          format: int
+          example: 32644534
+        state:
+          type: string
+          format: string
+        city:
+          type: string
+          format: string
+        timeZone:
+          type: string
+          format: string
+        zipCode:
+          type: integer
+          format: int
+        carrierName:
+          type: string
+          format: string
+        mainOfficeAddress:
+          type: string
+          format: string
+        ein:
+          type: integer
+          format: int
+        email:
+          type: string
+          format: string
+        password:
+          type: string
+          format: string
+ 
+ 
+   
