@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Eliteeld API Documentation
   description: |-
-     This API Eliteeld specification document
+    This API Eliteeld specification document
   termsOfService: http://swagger.io/terms/
   contact:
     email: avalonsendler@gmail.com
@@ -11,7 +11,7 @@ externalDocs:
   description: Find out more about Eliteeld
   url: http://swagger.io
 servers:
-  - url: https://gasstrem.com
+  - url: https://stage.gasstrem.com
 tags:
   - name: auth
     description: Authorization and user registration
@@ -32,23 +32,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CompanyRegistrationRequest'
+              $ref: "#/components/schemas/CompanyRegistrationRequest"
         required: true
       responses:
-        '200':
+        "200":
           description: Creted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CompanyRegistrationRequest'          
-        '400':
+                $ref: "#/components/schemas/CompanyRegistrationRequest"
+        "400":
           description: Invalid registration date
-        '404':
+        "404":
           description: this path not a found
-        '405':
+        "405":
           description: Validation exception
-
-            
 
 components:
   schemas:
@@ -59,7 +57,7 @@ components:
           type: string
           format: string
           example: "John"
-        surname: 
+        surname:
           type: string
           format: string
           example: "Smith"
@@ -98,6 +96,3 @@ components:
         password:
           type: string
           format: string
- 
- 
-   
