@@ -19,6 +19,20 @@ func NewHandler(service *service.Service) *Handler {
 	}
 }
 
+func (h *Handler) CorsMiddleware(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+	c.Header("Access-Control-Allow-Credentials", "true")
+	c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	c.Header("Content-Type", "application/json")
+
+	if c.Request.Method != "OPTIONS" {
+		c.Next()
+	} else {
+		c.AbortWithStatus(http.StatusOK)
+	}
+}
+
 func (h *Handler) InitRoutes(cfg *config.Config) *gin.Engine {
 	// TODO SET MODE FROM CONFIG
 	gin.SetMode(gin.DebugMode)
@@ -26,6 +40,7 @@ func (h *Handler) InitRoutes(cfg *config.Config) *gin.Engine {
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),
+		h.CorsMiddleware,
 	)
 
 	router.GET("/ping", func(c *gin.Context) {
