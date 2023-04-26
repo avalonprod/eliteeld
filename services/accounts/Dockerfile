@@ -17,5 +17,3 @@ RUN go build cmd/app/main.go
 
 CMD ["./main"]
 
-CMD ["./main"]
-
