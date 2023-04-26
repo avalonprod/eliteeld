@@ -1,7 +1,7 @@
 
 FROM golang:1.19
 
-EXPOSE 4000
+EXPOSE 8000
 
 WORKDIR /app
 

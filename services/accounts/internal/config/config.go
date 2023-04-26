@@ -9,18 +9,18 @@ import (
 )
 
 type Config struct {
-	HTTP     HTTPConfig `json:"http"`
+	HTTP     HTTPConfig
 	Mongo    MongoConfig
 	Password PasswordConfig
 }
 
 type (
 	HTTPConfig struct {
-		Host           string
-		Port           string        `json:"port"`
-		ReadTimeout    time.Duration `json:"readTimeout"`
-		WriteTimeout   time.Duration `json:"writeTimeout"`
-		MaxHeaderBytes int           `json:"maxHeaderBytes"`
+		Host           string        `mapstructure:"host"`
+		Port           string        `mapstructure:"port"`
+		ReadTimeout    time.Duration `mapstructure:"readTimeout"`
+		WriteTimeout   time.Duration `mapstructure:"writeTimeout"`
+		MaxHeaderBytes int           `mapstructure:"maxHeaderBytes"`
 	}
 	MongoConfig struct {
 		URL      string
