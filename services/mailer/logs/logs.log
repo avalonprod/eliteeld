@@ -1,0 +1,12 @@
+INFO: 2023/04/27 02:08:55 Server started
+ERROR: 2023/04/27 02:08:55 error occurred while running http server listen tcp :5000: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+INFO: 2023/04/27 02:09:37 Server started
+ERROR: 2023/04/27 02:10:10 failed to parse file :open : The system cannot find the file specified.
+ERROR: 2023/04/27 02:10:10 open : The system cannot find the file specified.
+INFO: 2023/04/27 02:12:47 Server started
+INFO: 2023/04/27 02:14:01 Server started
+INFO: 2023/04/27 02:20:31 Server started
+ERROR: 2023/04/27 02:20:34 failed to parse file ./templates/company_registration_template.htl:open ./templates/company_registration_template.htl: The system cannot find the file specified.
+ERROR: 2023/04/27 02:20:34 failed to send message from email: abramenkoroman22@gmail.com
+INFO: 2023/04/27 02:20:59 Server started
+INFO: 2023/04/27 02:26:14 Server started

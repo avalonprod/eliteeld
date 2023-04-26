@@ -1,0 +1,16 @@
+http:
+  port: 5001
+  maxHeaderBytes: 1
+  readTimeout: 10s
+  writeTimeout: 10s
+
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  from: "avalonsendler@gmail.com"
+
+email:
+  templates:
+    companyRegistration: "./templates/company_registration_template.html"
+  subjects:
+    companyRegistration: "Спасибо за регистрацию."

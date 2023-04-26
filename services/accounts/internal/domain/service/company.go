@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"time"
 
+	apperrors "github.com/avalonprod/eliteeld/accounts/appErrors"
 	"github.com/avalonprod/eliteeld/accounts/internal/adapters/repository"
 	"github.com/avalonprod/eliteeld/accounts/internal/domain/model"
 	"github.com/avalonprod/eliteeld/accounts/pkg/hasher"
@@ -33,7 +34,9 @@ func (u *UserService) UserLoginEmail(ctx context.Context, input model.LoginEmail
 	}
 	user, err := u.repository.GetUserByEmail(ctx, input.Email)
 	if err != nil {
-
+		if errors.Is(err, apperrors.ErrorUserNotFound) {
+			return "", err
+		}
 		return "", err
 	}
 
@@ -48,11 +51,13 @@ func (u *UserService) UserLoginPassword(ctx context.Context, input model.LoginPa
 
 	passwordHash, err := u.hasher.Hash(input.Password)
 	if err != nil {
+		u.logger.Errorf("failed to hash password. error: %v", err)
 		return model.UserPayload{}, err
 	}
 	user, err := u.repository.GetUserByEmail(ctx, input.Email)
 	if err != nil {
-		return model.UserPayload{}, err
+		u.logger.Errorf("failde to get user by email. error: %v", err)
+		return model.UserPayload{}, apperrors.ErrorUserNotFound
 	}
 	if user.Password != passwordHash {
 		return model.UserPayload{}, errors.New("Incorrect password")
@@ -67,6 +72,7 @@ func (u *UserService) UserLoginPassword(ctx context.Context, input model.LoginPa
 
 func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUserInput) error {
 	if err := emailValidate(input.Email); err != nil {
+
 		return err
 	}
 	if err := passwordValidate(input.Password); err != nil {
@@ -75,14 +81,17 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 
 	isDuplicate, err := u.repository.IsDuplicate(ctx, input.Email)
 	if err != nil {
-		return err
+		u.logger.Errorf("failed to check user is duplicate. error: %v", err)
+		return apperrors.ErrorUserNotFound
 	}
 	if isDuplicate {
-		return errors.New("user with this email already exists")
+		u.logger.Info("user alredy exist")
+		return apperrors.ErrUserAlreadyExists
 	}
 
 	passwordHash, err := u.hasher.Hash(input.Password)
 	if err != nil {
+		u.logger.Errorf("failed to hash password. error: %v", err)
 		return err
 	}
 	user := model.User{
@@ -97,6 +106,7 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 
 	err = u.repository.Create(ctx, user)
 	if err != nil {
+		u.logger.Errorf("failed to create user. error: %v", err)
 		return err
 	}
 	return nil

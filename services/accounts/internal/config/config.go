@@ -8,6 +8,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	defaultHTTPPort           = "8000"
+	defaultHTTPWriteTimeout   = 10 * time.Second
+	defaultHTTPReadTimeout    = 10 * time.Second
+	defaultHTTPMaxHeaderBytes = 1
+)
+
 type Config struct {
 	HTTP     HTTPConfig
 	Mongo    MongoConfig
@@ -42,6 +49,7 @@ func Init(configDir string) (*Config, error) {
 	if err := parseConfigFile(configDir); err != nil {
 		return nil, err
 	}
+	SetDefault()
 	setFromEnv(&cfg)
 	if err := unmarshal(&cfg); err != nil {
 		return nil, err
@@ -75,4 +83,12 @@ func setFromEnv(cfg *Config) {
 	cfg.Mongo.Database = os.Getenv("MONGODB_DATABASE")
 	cfg.HTTP.Host = os.Getenv("HTTP_HOST")
 	cfg.Password.PasswordSalt = os.Getenv("PASSWORD_SALT")
+}
+
+func SetDefault() {
+	viper.SetDefault("http.port", defaultHTTPPort)
+	viper.SetDefault("http.maxHeaderBytes", defaultHTTPMaxHeaderBytes)
+	viper.SetDefault("http.writeTimeout", defaultHTTPWriteTimeout)
+	viper.SetDefault("http.readTimeout", defaultHTTPReadTimeout)
+
 }
