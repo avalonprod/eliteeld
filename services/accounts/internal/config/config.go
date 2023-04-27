@@ -19,9 +19,13 @@ type Config struct {
 	HTTP     HTTPConfig
 	Mongo    MongoConfig
 	Password PasswordConfig
+	Emails   EmailsConfig
 }
 
 type (
+	EmailsConfig struct {
+		ApiUrl string `mapstructure:"apiUrl"`
+	}
 	HTTPConfig struct {
 		Host           string        `mapstructure:"host"`
 		Port           string        `mapstructure:"port"`
@@ -60,6 +64,10 @@ func Init(configDir string) (*Config, error) {
 func unmarshal(cfg *Config) error {
 
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("emails", &cfg.Emails); err != nil {
 		return err
 	}
 	return nil

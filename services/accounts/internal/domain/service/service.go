@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/avalonprod/eliteeld/accounts/internal/adapters/emails"
 	"github.com/avalonprod/eliteeld/accounts/internal/adapters/repository"
 	"github.com/avalonprod/eliteeld/accounts/internal/domain/model"
 	"github.com/avalonprod/eliteeld/accounts/pkg/hasher"
@@ -23,10 +24,11 @@ type Options struct {
 	Repository *repository.Repository
 	Logger     logger.Logger
 	Hasher     hasher.PasswordHasher
+	Emails     emails.Emails
 }
 
 func NewService(options *Options) *Service {
-	userService := NewUserService(options.Repository.User, options.Logger, options.Hasher)
+	userService := NewUserService(options.Repository.User, options.Logger, options.Hasher, options.Emails)
 	return &Service{
 		User: userService,
 	}

@@ -6,8 +6,9 @@ import (
 	"regexp"
 	"time"
 
-	apperrors "github.com/avalonprod/eliteeld/accounts/appErrors"
+	"github.com/avalonprod/eliteeld/accounts/internal/adapters/emails"
 	"github.com/avalonprod/eliteeld/accounts/internal/adapters/repository"
+	apperrors "github.com/avalonprod/eliteeld/accounts/internal/appErrors"
 	"github.com/avalonprod/eliteeld/accounts/internal/domain/model"
 	"github.com/avalonprod/eliteeld/accounts/pkg/hasher"
 	"github.com/avalonprod/eliteeld/accounts/pkg/logger"
@@ -17,13 +18,15 @@ type UserService struct {
 	repository repository.User
 	logger     logger.Logger
 	hasher     hasher.PasswordHasher
+	emails     emails.Emails
 }
 
-func NewUserService(repository repository.User, logger logger.Logger, hasher hasher.PasswordHasher) *UserService {
+func NewUserService(repository repository.User, logger logger.Logger, hasher hasher.PasswordHasher, emails emails.Emails) *UserService {
 	return &UserService{
 		repository: repository,
 		logger:     logger,
 		hasher:     hasher,
+		emails:     emails,
 	}
 }
 
@@ -109,6 +112,7 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 		u.logger.Errorf("failed to create user. error: %v", err)
 		return err
 	}
+	u.emails.SendEmailCompanyRegistration(input.Email, input.Name)
 	return nil
 }
 

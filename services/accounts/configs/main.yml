@@ -3,3 +3,6 @@ http:
   readTimeout: 20s
   writeTimeout: 20s
   maxHeaderBytes: 1
+
+emailsService:
+  url: "https://mailer.gasstrem.com/api/v1/email/company-registration"

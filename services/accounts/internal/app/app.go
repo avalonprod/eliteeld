@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/avalonprod/eliteeld/accounts/internal/adapters/emails"
 	"github.com/avalonprod/eliteeld/accounts/internal/adapters/repository"
 	"github.com/avalonprod/eliteeld/accounts/internal/config"
 	"github.com/avalonprod/eliteeld/accounts/internal/controller"
@@ -30,6 +31,8 @@ func Run() {
 		return
 	}
 
+	emails := emails.NewEmails(cfg.Emails.ApiUrl)
+
 	mongoClient, err := mongodb.NewConnection(&mongodb.Config{
 		URL:      cfg.Mongo.URL,
 		Username: cfg.Mongo.Username,
@@ -39,6 +42,7 @@ func Run() {
 	if err != nil {
 		logger.Errorf("failed to connection mongodb. error: %v", err)
 	}
+
 	mongodb := mongoClient.Database(cfg.Mongo.Database)
 	hasher := hasher.NewHasher(cfg.Password.PasswordSalt)
 	repository := repository.NewRepository(mongodb)
@@ -46,6 +50,7 @@ func Run() {
 		Repository: repository,
 		Logger:     *logger,
 		Hasher:     hasher,
+		Emails:     *emails,
 	})
 	handler := controller.NewHandler(service)
 	srv := NewServer(cfg, handler.InitRoutes(cfg))
