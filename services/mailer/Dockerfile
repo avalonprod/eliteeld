@@ -11,7 +11,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build cmd/main.go 
+RUN go build cmd/app/main.go 
 
 
 CMD ["./main"]
