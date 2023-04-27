@@ -31,7 +31,7 @@ func Run() {
 		return
 	}
 
-	emails := emails.NewEmails(cfg.Emails.ApiUrl)
+	emails := emails.NewEmails(cfg.Emails.Url)
 
 	mongoClient, err := mongodb.NewConnection(&mongodb.Config{
 		URL:      cfg.Mongo.URL,

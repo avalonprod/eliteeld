@@ -24,7 +24,7 @@ type Config struct {
 
 type (
 	EmailsConfig struct {
-		ApiUrl string `mapstructure:"apiUrl"`
+		Url string `mapstructure:"url"`
 	}
 	HTTPConfig struct {
 		Host           string        `mapstructure:"host"`
