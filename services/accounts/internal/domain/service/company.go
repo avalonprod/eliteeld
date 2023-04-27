@@ -100,6 +100,7 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 	user := model.User{
 		Name:           input.Name,
 		Surname:        input.Surname,
+		Usdot:          32,
 		Email:          input.Email,
 		Password:       passwordHash,
 		RegisteredTime: time.Now(),

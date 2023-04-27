@@ -67,7 +67,7 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
-	if err := viper.UnmarshalKey("emails", &cfg.Emails); err != nil {
+	if err := viper.UnmarshalKey("emailsService", &cfg.Emails); err != nil {
 		return err
 	}
 	return nil
