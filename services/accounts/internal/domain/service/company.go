@@ -74,7 +74,6 @@ func (u *UserService) UserLoginPassword(ctx context.Context, input model.LoginPa
 }
 
 func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUserInput) error {
-	if input.
 	if err := emailValidate(input.Email); err != nil {
 
 		return err
@@ -85,7 +84,15 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 
 	isDuplicate, err := u.repository.IsDuplicate(ctx, input.Email)
 	if err != nil {
-		u.logger.Errorf("failed to check user is duplicate. error: %v", err) 
+		u.logger.Errorf("failed to check user is duplicate. error: %v", err)
+		return apperrors.ErrorUserNotFound
+	}
+	if isDuplicate {
+		u.logger.Info("user alredy exist")
+		return apperrors.ErrUserAlreadyExists
+	}
+
+	passwordHash, err := u.hasher.Hash(input.Password)
 	if err != nil {
 		u.logger.Errorf("failed to hash password. error: %v", err)
 		return err
@@ -114,7 +121,12 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 		u.logger.Errorf("failed to create user. error: %v", err)
 		return err
 	}
-	u.emails.SendEmailCompanyRegistration(input.Email, input.Name)
+	go func() {
+		err := u.emails.SendEmailCompanyRegistration(input.Email, input.Name)
+		if err != nil {
+			u.logger.Debugf("failed to send email. error: %v", err)
+		}
+	}()
 	return nil
 }
 
