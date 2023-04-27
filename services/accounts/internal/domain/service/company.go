@@ -74,6 +74,7 @@ func (u *UserService) UserLoginPassword(ctx context.Context, input model.LoginPa
 }
 
 func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUserInput) error {
+	if input.
 	if err := emailValidate(input.Email); err != nil {
 
 		return err
@@ -84,28 +85,28 @@ func (u *UserService) UserRegister(ctx context.Context, input model.RegisterUser
 
 	isDuplicate, err := u.repository.IsDuplicate(ctx, input.Email)
 	if err != nil {
-		u.logger.Errorf("failed to check user is duplicate. error: %v", err)
-		return apperrors.ErrorUserNotFound
-	}
-	if isDuplicate {
-		u.logger.Info("user alredy exist")
-		return apperrors.ErrUserAlreadyExists
-	}
-
-	passwordHash, err := u.hasher.Hash(input.Password)
+		u.logger.Errorf("failed to check user is duplicate. error: %v", err) 
 	if err != nil {
 		u.logger.Errorf("failed to hash password. error: %v", err)
 		return err
 	}
 	user := model.User{
-		Name:           input.Name,
-		Surname:        input.Surname,
-		Usdot:          32,
-		Email:          input.Email,
-		Password:       passwordHash,
-		RegisteredTime: time.Now(),
-		LastVisitTime:  time.Now(),
-		Verification:   false,
+		Name:              input.Name,
+		Surname:           input.Surname,
+		Usdot:             input.Usdot,
+		State:             input.State,
+		City:              input.City,
+		TimeZone:          input.TimeZone,
+		ZipCode:           input.ZipCode,
+		FleetSize:         input.FleetSize,
+		CarrierName:       input.CarrierName,
+		MainOfficeAddress: input.MainOfficeAddress,
+		Ein:               input.Ein,
+		Email:             input.Email,
+		Password:          passwordHash,
+		RegisteredTime:    time.Now(),
+		LastVisitTime:     time.Now(),
+		Verification:      false,
 	}
 
 	err = u.repository.Create(ctx, user)
