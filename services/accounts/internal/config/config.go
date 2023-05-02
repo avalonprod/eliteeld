@@ -16,10 +16,10 @@ const (
 )
 
 type Config struct {
-	HTTP     HTTPConfig
-	Mongo    MongoConfig
-	Password PasswordConfig
-	Emails   EmailsConfig
+	HTTP   HTTPConfig
+	Mongo  MongoConfig
+	Auth   AuthConfig
+	Emails EmailsConfig
 }
 
 type (
@@ -39,8 +39,15 @@ type (
 		Username string
 		Password string
 	}
-	PasswordConfig struct {
+	AuthConfig struct {
+		JWT          JWTConfig
 		PasswordSalt string
+	}
+
+	JWTConfig struct {
+		AccessTokenTTL  time.Duration `mapstructure:"accessTokenTTL"`
+		RefreshTokenTTL time.Duration `mapstructure:"refreshTokenTTL"`
+		SigningKey      string
 	}
 )
 
@@ -67,6 +74,10 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
+	if err := viper.UnmarshalKey("auth", &cfg.Auth.JWT); err != nil {
+		return err
+	}
+
 	if err := viper.UnmarshalKey("emailsService", &cfg.Emails); err != nil {
 		return err
 	}
@@ -90,7 +101,8 @@ func setFromEnv(cfg *Config) {
 	cfg.Mongo.Password = os.Getenv("MONGODB_PASSWORD")
 	cfg.Mongo.Database = os.Getenv("MONGODB_DATABASE")
 	cfg.HTTP.Host = os.Getenv("HTTP_HOST")
-	cfg.Password.PasswordSalt = os.Getenv("PASSWORD_SALT")
+	cfg.Auth.PasswordSalt = os.Getenv("PASSWORD_SALT")
+	cfg.Auth.JWT.SigningKey = os.Getenv("JWT_SIGNING_KEY")
 }
 
 func SetDefault() {

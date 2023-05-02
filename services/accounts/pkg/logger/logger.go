@@ -6,13 +6,13 @@ import (
 )
 
 type Logging interface {
-	Info(msg string)
+	Info(msg interface{})
 	Infof(msg string, params ...interface{})
-	Debug(msg string)
+	Debug(msg interface{})
 	Debugf(msg string, params ...interface{})
-	Error(msg string)
+	Error(msg interface{})
 	Errorf(msg string, params ...interface{})
-	Warn(msg string)
+	Warn(msg interface{})
 	Warnf(msg string, params ...interface{})
 }
 
@@ -42,7 +42,7 @@ func (l *Logger) Init(fileName string) {
 
 }
 
-func (l *Logger) Info(msg string) {
+func (l *Logger) Info(msg interface{}) {
 	infoLogger.Print(msg)
 
 }
@@ -51,7 +51,7 @@ func (l *Logger) Infof(msg string, params ...interface{}) {
 	infoLogger.Printf(msg, params...)
 }
 
-func (l *Logger) Debug(msg string) {
+func (l *Logger) Debug(msg interface{}) {
 	debugLogger.Print(msg)
 }
 
@@ -59,7 +59,7 @@ func (l *Logger) Debugf(msg string, params ...interface{}) {
 	debugLogger.Printf(msg, params...)
 }
 
-func (l *Logger) Error(msg string) {
+func (l *Logger) Error(msg interface{}) {
 	errorLogger.Print(msg)
 }
 
@@ -67,7 +67,7 @@ func (l *Logger) Errorf(msg string, params ...interface{}) {
 	errorLogger.Printf(msg, params...)
 }
 
-func (l *Logger) Warn(msg string) {
+func (l *Logger) Warn(msg interface{}) {
 	warnLogger.Print(msg)
 }
 

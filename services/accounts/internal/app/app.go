@@ -9,55 +9,63 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/avalonprod/eliteeld/accounts/internal/adapters/emails"
-	"github.com/avalonprod/eliteeld/accounts/internal/adapters/repository"
 	"github.com/avalonprod/eliteeld/accounts/internal/config"
-	"github.com/avalonprod/eliteeld/accounts/internal/controller"
-	"github.com/avalonprod/eliteeld/accounts/internal/domain/service"
+	"github.com/avalonprod/eliteeld/accounts/internal/core/services"
+	"github.com/avalonprod/eliteeld/accounts/internal/infrastructure/emails"
+	"github.com/avalonprod/eliteeld/accounts/internal/interfaces/api/rest"
+	"github.com/avalonprod/eliteeld/accounts/internal/storages"
+	"github.com/avalonprod/eliteeld/accounts/pkg/auth"
 	"github.com/avalonprod/eliteeld/accounts/pkg/db/mongodb"
 	"github.com/avalonprod/eliteeld/accounts/pkg/hasher"
 	"github.com/avalonprod/eliteeld/accounts/pkg/logger"
 )
 
-const configsDir = "configs"
-const logsFile = "logs/logs.log"
-
 func Run() {
+
 	logger := logger.NewLogger()
-	logger.Init(logsFile)
-	cfg, err := config.Init(configsDir)
+	logger.Init("logs/logs.log")
+
+	cfg, err := config.Init("configs")
 	if err != nil {
-		logger.Errorf("error parse config. error: %v", err)
+		logger.Error(err)
 		return
 	}
-
-	emails := emails.NewEmails(cfg.Emails.Url)
-
 	mongoClient, err := mongodb.NewConnection(&mongodb.Config{
 		URL:      cfg.Mongo.URL,
 		Username: cfg.Mongo.Username,
 		Password: cfg.Mongo.Password,
 	})
-
 	if err != nil {
-		logger.Errorf("failed to connection mongodb. error: %v", err)
+		logger.Errorf("failed to create new mongo client. error: %v", err)
+		return
 	}
-
 	mongodb := mongoClient.Database(cfg.Mongo.Database)
-	hasher := hasher.NewHasher(cfg.Password.PasswordSalt)
-	repository := repository.NewRepository(mongodb)
-	service := service.NewService(&service.Options{
-		Repository: repository,
-		Logger:     *logger,
-		Hasher:     hasher,
-		Emails:     *emails,
+	tokenManager, err := auth.NewManager(cfg.Auth.JWT.SigningKey)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	emails := emails.NewEmails(cfg.Emails.Url)
+	hasher := hasher.NewHasher(cfg.Auth.PasswordSalt)
+	storages := storages.NewStorages(mongodb)
+	services := services.NewServices(&services.Deps{
+		CompanyStorage:  storages.Company,
+		Hasher:          hasher,
+		Logger:          logger,
+		TokenManager:    tokenManager,
+		AccessTokenTTL:  cfg.Auth.JWT.AccessTokenTTL,
+		RefreshTokenTTL: cfg.Auth.JWT.RefreshTokenTTL,
+		EmailsService:   emails,
 	})
-	handler := controller.NewHandler(service)
-	srv := NewServer(cfg, handler.InitRoutes(cfg))
+	restHandlers := rest.NewHandler(services, tokenManager)
+
+	// Starting server
+	srv := NewServer(cfg, restHandlers.Init(cfg))
 
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
 			logger.Errorf("error occurred while running http server %s\n", err.Error())
+			return
 		}
 	}()
 	logger.Info("Server started")
@@ -73,6 +81,9 @@ func Run() {
 
 	if err := srv.Stop(ctx); err != nil {
 		logger.Errorf("failed to stop server: %v", err)
+	}
+	if err := mongoClient.Disconnect(context.Background()); err != nil {
+		logger.Error(err.Error())
 	}
 }
 

@@ -6,3 +6,8 @@ http:
 
 emailsService:
   url: "https://mailer.gasstrem.com/api/v1/email/company-registration"
+
+auth:
+  accessTokenTTL: 2h
+  refreshTokenTTL: 720h #30 days
+
