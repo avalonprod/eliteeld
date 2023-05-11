@@ -25,6 +25,7 @@ func (h *Handler) InitCompanyRoutes(api *gin.RouterGroup) {
 			// Remove
 			authenticated.GET("/test-auth", func(c *gin.Context) { c.String(http.StatusOK, "авторизирован") })
 			authenticated.POST("/change-password", h.companyChangePassword)
+			authenticated.POST("/create-new-driver", h.companyCreateNewDriver)
 		}
 	}
 }
