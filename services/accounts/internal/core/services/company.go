@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/avalonprod/eliteeld/accounts/internal/core/models"
@@ -20,6 +21,7 @@ const (
 
 type CompanyService struct {
 	companyStorage  storages.Company
+	driversService  Drivers
 	hasher          hasher.PasswordHasher
 	tokenManager    auth.TokenManager
 	accessTokenTTL  time.Duration
@@ -27,7 +29,7 @@ type CompanyService struct {
 	emailsService   *emails.Emails
 }
 
-func NewCompanyService(companyStorage storages.Company, hasher hasher.PasswordHasher, tokenManager auth.TokenManager, accessTokenTTL time.Duration, refreshTokenTTL time.Duration, emailsService *emails.Emails) *CompanyService {
+func NewCompanyService(companyStorage storages.Company, hasher hasher.PasswordHasher, tokenManager auth.TokenManager, accessTokenTTL time.Duration, refreshTokenTTL time.Duration, emailsService *emails.Emails, driversService Drivers) *CompanyService {
 	return &CompanyService{
 		companyStorage:  companyStorage,
 		hasher:          hasher,
@@ -35,6 +37,7 @@ func NewCompanyService(companyStorage storages.Company, hasher hasher.PasswordHa
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
 		emailsService:   emailsService,
+		driversService:  driversService,
 	}
 }
 
@@ -136,4 +139,54 @@ func (s *CompanyService) RefreshTokens(ctx context.Context, refreshToken string)
 	}
 
 	return s.createSession(ctx, company.ID)
+}
+
+func (s *CompanyService) CompanyChangePassword(ctx context.Context, userID string, input types.ChangePasswordDTO) error {
+	err := validatePassword(input.Password)
+	if err != nil {
+		return err
+	}
+	err = validatePassword(input.NewPassword)
+	if err != nil {
+		return err
+	}
+	if strings.Trim(input.Password, " ") == strings.Trim(input.NewPassword, " ") {
+		return errors.New("the new password cannot be the same as the old password")
+	}
+	passwordHash, err := s.hasher.Hash(input.Password)
+	if err != nil {
+		return err
+	}
+	newPasswordHash, err := s.hasher.Hash(input.NewPassword)
+	if err != nil {
+		return err
+	}
+	err = s.companyStorage.ChangePassword(ctx, userID, passwordHash, newPasswordHash)
+	if err != nil {
+		if errors.Is(err, errors.New(ErrCompanyNotFound)) {
+			return err
+		}
+		return err
+	}
+	return nil
+}
+
+func (s *CompanyService) CompanyForgotPassword(ctx context.Context, email string) {
+
+}
+
+func (s *CompanyService) CompanyCreateNewDriver(ctx context.Context, input types.DriverSignUpDTO, companyID string) error {
+	company, err := s.companyStorage.GetByCompanyID(ctx, companyID)
+	if err != nil {
+		if errors.Is(err, errors.New(ErrCompanyNotFound)) {
+			return err
+		}
+		return err
+	}
+
+	err = s.driversService.DriversSignUp(ctx, input, company.CarrierName, company.Email)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -40,3 +40,16 @@ func (h *Handler) parseAuthHeader(c *gin.Context) (string, error) {
 
 	return h.tokenManager.Parse(headerParts[1])
 }
+
+func getCompanyId(c *gin.Context) (string, error) {
+	return getIdByContext(c, companyCtx)
+}
+
+func getIdByContext(c *gin.Context, context string) (string, error) {
+	idFromCtx, ok := c.Get(context)
+	if !ok {
+		return "", errors.New("companyCtx not found")
+	}
+	id := idFromCtx.(string)
+	return id, nil
+}

@@ -21,8 +21,10 @@ func (h *Handler) InitCompanyRoutes(api *gin.RouterGroup) {
 		company.POST("/refresh", h.companyRefresh)
 		authenticated := company.Group("/", h.companyIdentity)
 		{
+
 			// Remove
 			authenticated.GET("/test-auth", func(c *gin.Context) { c.String(http.StatusOK, "авторизирован") })
+			authenticated.POST("/change-password", h.companyChangePassword)
 		}
 	}
 }
@@ -91,4 +93,65 @@ func (h *Handler) companyRefresh(c *gin.Context) {
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 	})
+}
+
+func (h *Handler) companyChangePassword(c *gin.Context) {
+	var input types.ChangePasswordDTO
+	if err := c.BindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	id, err := getCompanyId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	err = h.services.Company.CompanyChangePassword(c.Request.Context(), id, input)
+
+	if err != nil {
+		if errors.Is(err, errors.New(ErrCompanyNotFound)) {
+			newResponse(c, http.StatusBadRequest, err.Error())
+
+			return
+		}
+
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+	c.Status(http.StatusCreated)
+}
+
+func (h *Handler) companyCreateNewDriver(c *gin.Context) {
+	var input types.DriverSignUpDTO
+
+	if err := c.BindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	id, err := getCompanyId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	err = h.services.Company.CompanyCreateNewDriver(c.Request.Context(), input, id)
+
+	if err != nil {
+		if errors.Is(err, errors.New(ErrCompanyNotFound)) {
+			newResponse(c, http.StatusBadRequest, err.Error())
+
+			return
+		}
+
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+	c.Status(http.StatusCreated)
 }

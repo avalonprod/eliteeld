@@ -1,0 +1,67 @@
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Регистрация успешна!</title>
+    <style>
+      /* Font */
+      @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap");
+      /* Global styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Open Sans", sans-serif;
+      }
+      body {
+        background-color: #f5f5f5;
+      }
+      .wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      p {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #108a00;
+        color: #fff;
+        font-size: 16px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+	  .button span {
+		color: #fff;
+	  }
+      .button:hover {
+        background-color: #0b5d00;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Добро пожаловать, {{.Name}}!</h1>
+      <h2>Вы были зарегистрированны компанией {{.CompanyName}}</h2>
+      <p>Чтобы связаться с {{.CompanyName}} вы можете обратиться сюда {{.CompanyEmail}}</p>
+      <p>Для того, чтобы начать пользоваться нашим сервисом, вам нужно войти в свой аккаунт:</p>
+      <a href="#" class="button" style="color: #fff"><span>LOG IN</span></a>
+
+      <a href="#" class="button" style="color: #fff"><span><img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pngwing.com%2Fru%2Ffree-png-pkdjr&psig=AOvVaw1RzMOkQWm0pfgkgSxCfI3J&ust=1683890812903000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCNCHsqCU7f4CFQAAAAAdAAAAABAE" alt=""></span></a>
+    </div>
+  </body>

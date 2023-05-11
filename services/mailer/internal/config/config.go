@@ -32,6 +32,7 @@ type (
 
 	EmailSubjects struct {
 		CompanyRegistration string `mapstructure:"companyRegistration"`
+		DriverRegistration  string `mapstructure:"driverRegistration"`
 	}
 
 	EmailConfig struct {
@@ -41,6 +42,7 @@ type (
 
 	EmailTemplates struct {
 		CompanyRegistrationTemplate string `mapstructure:"companyRegistration"`
+		DriverRegistrationTemplate  string `mapstructure:"driverRegistration"`
 	}
 
 	SMTPConfig struct {

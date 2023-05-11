@@ -45,7 +45,7 @@ func Run() {
 		logger.Error(err)
 		return
 	}
-	emails := emails.NewEmails(cfg.Emails.Url)
+	emails := emails.NewEmails(cfg.Emails.ApiUrlCompanyRegistration, cfg.Emails.ApiUrlDriverRegistration)
 	hasher := hasher.NewHasher(cfg.Auth.PasswordSalt)
 	storages := storages.NewStorages(mongodb)
 	services := services.NewServices(&services.Deps{

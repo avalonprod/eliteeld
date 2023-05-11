@@ -23,3 +23,14 @@ func validateCredentials(email, password string) error {
 	}
 	return nil
 }
+
+func validatePassword(password string) error {
+	if password == "" {
+		return errors.New("password cannot be empty")
+	}
+
+	if len(password) < 8 || !regexp.MustCompile(`[A-Z]+`).MatchString(password) || !regexp.MustCompile(`\d+`).MatchString(password) {
+		return errors.New("Password must be at least 8 characters long and contain at least one uppercase letter and one digit")
+	}
+	return nil
+}

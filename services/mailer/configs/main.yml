@@ -12,5 +12,7 @@ smtp:
 email:
   templates:
     companyRegistration: "./templates/company_registration_template.html"
+    driverRegistration: "./templates/driver_registration_template.html"
   subjects:
     companyRegistration: "Спасибо за регистрацию."
+    driverRegistration: "Вас зарегистрировала компания %s"

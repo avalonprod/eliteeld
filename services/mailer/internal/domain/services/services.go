@@ -11,6 +11,7 @@ import (
 
 type EmailsI interface {
 	SendEmailCompanyRegistration(ctx context.Context, input models.CompanyRegistrationEmailDTO) error
+	SendEmailDriverRegistration(ctx context.Context, input models.DriverRegistrationEmailDTO) error
 }
 
 type Services struct {

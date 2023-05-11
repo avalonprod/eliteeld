@@ -41,3 +41,21 @@ func (s *EmailsService) SendEmailCompanyRegistration(ctx context.Context, input 
 	}
 	return nil
 }
+
+func (s *EmailsService) SendEmailDriverRegistration(ctx context.Context, input models.DriverRegistrationEmailDTO) error {
+	subject := fmt.Sprintf(s.config.Subjects.DriverRegistration, input.CompanyName)
+	sendInput := email.SendEmailInput{To: input.Email, Subject: subject}
+	templateInput := models.DriverRegistrationEmail{Email: input.Email, Name: input.Name, CompanyName: input.CompanyName, CompanyEmail: input.CompanyEmail}
+
+	err := sendInput.GenerateBodyFromHTML(s.config.Templates.DriverRegistrationTemplate, templateInput)
+	if err != nil {
+		return err
+	}
+
+	err = s.sender.Send(sendInput)
+	if err != nil {
+		s.logger.Debugf("failed to send message from email: %s, error: %v", input.Email, err)
+		return err
+	}
+	return nil
+}

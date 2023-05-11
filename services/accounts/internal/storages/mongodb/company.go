@@ -11,8 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const ErrUserNotFound = "user doesn't exists"
-
 type CompanyStorage struct {
 	db *mongo.Collection
 }
@@ -46,7 +44,12 @@ func (s *CompanyStorage) GetByCredentials(ctx context.Context, email, password s
 
 	err := res.Err()
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return company, errors.New(ErrUserNotFound)
+		}
+
 		return company, err
+
 	}
 	if err := res.Decode(&company); err != nil {
 		return company, err
@@ -93,6 +96,60 @@ func (s *CompanyStorage) GetByRefreshToken(ctx context.Context, refreshToken str
 			return models.Company{}, errors.New(ErrUserNotFound)
 		}
 
+		return models.Company{}, err
+	}
+
+	return company, nil
+}
+
+func (s *CompanyStorage) ChangePassword(ctx context.Context, companyID, password, newPassword string) error {
+	nCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	ObjectID, err := primitive.ObjectIDFromHex(companyID)
+	filter := bson.M{"_id": ObjectID, "password": password}
+	update := bson.M{"$set": bson.M{"password": newPassword}}
+	res := s.db.FindOne(nCtx, filter)
+	err = res.Err()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return errors.New(ErrUserNotFound)
+		}
+
+		return err
+
+	}
+	_, err = s.db.UpdateOne(nCtx, filter, update)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *CompanyStorage) GetByCompanyID(ctx context.Context, companyID string) (models.Company, error) {
+	nCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var company models.Company
+
+	ObjectID, err := primitive.ObjectIDFromHex(companyID)
+	filter := bson.M{"_id": ObjectID}
+
+	res := s.db.FindOne(nCtx, filter)
+	err = res.Err()
+	res.Decode(&company)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return models.Company{}, errors.New(ErrUserNotFound)
+		}
+
+		return models.Company{}, err
+
+	}
+
+	if err != nil {
 		return models.Company{}, err
 	}
 
